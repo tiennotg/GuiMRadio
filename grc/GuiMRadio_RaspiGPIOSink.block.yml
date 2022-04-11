@@ -1,0 +1,39 @@
+id: GuiMRadio_RaspiGPIOSink
+label: RaspiGPIOSink
+category: '[GuiMRadio]'
+flags: [ python ]
+
+templates:
+  imports: |-
+    import GuiMRadio
+    from GuiMRadio.RaspiGPIOSink import TURN_HIGH, TURN_LOW, KEEP_HIGH, KEEP_LOW, TOGGLE
+  make: GuiMRadio.RaspiGPIOSink(gpio_number=${gpio_number},threshold=${threshold},mode=${mode})
+
+parameters:
+- id: gpio_number
+  label: GPIO Number
+  dtype: int
+  default: 0
+- id: threshold
+  label: Threshold
+  dtype: float
+  default: 0
+- id: mode
+  label: If Triggered
+  dtype: enum
+  options: [TURN_HIGH,TURN_LOW,KEEP_HIGH,KEEP_LOW,TOGGLE]
+  option_labels: [Turn High, Turn Low, Keep High, Keep Low, Toggle]
+  default: TURN_HIGH
+
+asserts:
+- ${gpio_number >= 0 and gpio_number <= 27} # Raspberry Pi v2+ GPIO count: 28
+
+inputs:
+- label: in
+  domain: stream
+  dtype: float
+  vlen: 1
+  optional: 0
+
+
+file_format: 1

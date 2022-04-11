@@ -1,0 +1,70 @@
+id: GuiMRadio_ExecOTPSink
+label: ExecOTPSink
+category: '[GuiMRadio]'
+
+templates:
+  imports: |-
+    import GuiMRadio
+    from GuiMRadio.OTPSink import T_OTP,H_OTP
+  make: GuiMRadio.ExecOTPSink(otp_type=${otp_type},otp_basetime=${otp_basetime},otp_startat=${otp_startat},secret=${otp_secret},cmd=${exec_cmd},init_cmd=${init_cmd},close_cmd=${close_cmd})
+#  Make one 'parameters' list entry for every parameter you want settable from the GUI.
+#     Keys include:
+#     * id (makes the value accessible as keyname, e.g. in the make entry)
+#     * label (label shown in the GUI)
+#     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#     * default
+parameters:
+- id: otp_type
+  label: Type
+  dtype: enum
+  options: [T_OTP,H_OTP]
+  option_labels: ["Time-based","Counter-based"]
+  default: T_OTP
+- id: otp_secret
+  label: Secret
+  dtype: string
+- id: otp_basetime
+  label: Time
+  dtype: int
+  default: 30
+  hide: ${ ('none' if otp_type == 'T_OTP' else 'all') }
+- id: otp_startat
+  label: Start at
+  dtype: int
+  default: 0
+  hide: ${ ('none' if otp_type == 'H_OTP' else 'all') }
+- id: exec_cmd
+  label: Command to execute
+  dtype: string
+  default: "echo OK"
+- id: init_cmd
+  label: Initialization command
+  dtype: string
+  default: ""
+- id: close_cmd
+  label: Closing command
+  dtype: string
+  default: "echo OK"
+
+asserts:
+- ${otp_basetime > 0}
+- ${otp_startat >= 0}
+- ${otp_secret != ""}
+- ${exec_cmd != ""}
+
+#  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
+#  Keys include:
+#      * label (an identifier for the GUI)
+#      * domain (optional - stream or message. Default is stream)
+#      * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#      * vlen (optional - data stream vector length. Default is 1)
+#      * optional (optional - set to 1 for optional inputs. Default is 0)
+inputs:
+- label: in
+  domain: stream
+  dtype: byte
+  vlen: 1
+  optional: 0
+
+
+file_format: 1

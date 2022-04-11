@@ -1,0 +1,62 @@
+id: GuiMRadio_RaspiOTPSink
+label: RaspiOTPSink
+category: '[GuiMRadio]'
+
+templates:
+  imports: |-
+    import GuiMRadio
+    from GuiMRadio.OTPSink import T_OTP,H_OTP
+  make: GuiMRadio.RaspiOTPSink(otp_type=${otp_type},otp_basetime=${otp_basetime},otp_startat=${otp_startat},secret=${otp_secret},gpio_number=${otp_gpio})
+#  Make one 'parameters' list entry for every parameter you want settable from the GUI.
+#     Keys include:
+#     * id (makes the value accessible as keyname, e.g. in the make entry)
+#     * label (label shown in the GUI)
+#     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#     * default
+parameters:
+- id: otp_type
+  label: Type
+  dtype: enum
+  options: [T_OTP,H_OTP]
+  option_labels: ["Time-based","Counter-based"]
+  default: T_OTP
+- id: otp_secret
+  label: Secret
+  dtype: string
+- id: otp_basetime
+  label: Time
+  dtype: int
+  default: 30
+  hide: ${ ('none' if otp_type == 'T_OTP' else 'all') }
+- id: otp_startat
+  label: Start at
+  dtype: int
+  default: 0
+  hide: ${ ('none' if otp_type == 'H_OTP' else 'all') }
+- id: otp_gpio
+  label: GPIO number
+  dtype: int
+  default: 0
+
+asserts:
+- ${otp_basetime > 0}
+- ${otp_startat >= 0}
+- ${otp_secret != ""}
+- ${otp_gpio >= 0 and otp_gpio <= 27} # Raspberry Pi v2+ GPIO count: 28
+
+#  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
+#  Keys include:
+#      * label (an identifier for the GUI)
+#      * domain (optional - stream or message. Default is stream)
+#      * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#      * vlen (optional - data stream vector length. Default is 1)
+#      * optional (optional - set to 1 for optional inputs. Default is 0)
+inputs:
+- label: in
+  domain: stream
+  dtype: byte
+  vlen: 1
+  optional: 0
+
+
+file_format: 1

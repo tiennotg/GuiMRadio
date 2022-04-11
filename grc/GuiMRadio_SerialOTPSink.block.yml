@@ -1,0 +1,90 @@
+id: GuiMRadio_SerialOTPSink
+label: SerialOTPSink
+category: '[GuiMRadio]'
+
+templates:
+  imports: |-
+    import GuiMRadio
+    from serial import PARITY_EVEN,PARITY_ODD,PARITY_NONE
+    from GuiMRadio.OTPSink import T_OTP,H_OTP
+  make: GuiMRadio.SerialOTPSink(otp_type=${otp_type},otp_basetime=${otp_basetime},otp_startat=${otp_startat},secret=${otp_secret},data=${serial_data},sfile=${serial_port},baudrate=${serial_baud},bits=${serial_bits},stopbits=${serial_stopbits},parity=${serial_parity})
+#  Make one 'parameters' list entry for every parameter you want settable from the GUI.
+#     Keys include:
+#     * id (makes the value accessible as keyname, e.g. in the make entry)
+#     * label (label shown in the GUI)
+#     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#     * default
+parameters:
+- id: otp_type
+  label: Type
+  dtype: enum
+  options: [T_OTP,H_OTP]
+  option_labels: ["Time-based","Counter-based"]
+  default: T_OTP
+- id: otp_secret
+  label: Secret
+  dtype: string
+- id: otp_basetime
+  label: Time
+  dtype: int
+  default: 30
+  hide: ${ ('none' if otp_type == 'T_OTP' else 'all') }
+- id: otp_startat
+  label: Start at
+  dtype: int
+  default: 0
+  hide: ${ ('none' if otp_type == 'H_OTP' else 'all') }
+- id: serial_data
+  label: Data to send over serial
+  dtype: string
+  default: ""
+- id: serial_port
+  label: Serial port
+  dtype: string
+  default: ""
+- id: serial_baud
+  label: Serial baud rate
+  dtype: int
+  default: 9600
+- id: serial_bits
+  label: Serial byte size
+  dtype: int
+  default: 8
+- id: serial_parity
+  label: Serial parity
+  dtype: enum
+  options: [PARITY_NONE,PARITY_ODD,PARITY_EVEN]
+  option_labels: ["None","Odd","Even"]
+  default: "N"
+- id: serial_stopbits
+  label: Serial stop bit count
+  dtype: int
+  default: 1
+
+asserts:
+- ${otp_basetime > 0}
+- ${otp_startat >= 0}
+- ${otp_secret != ""}
+- ${serial_port != ""}
+- ${serial_baud > 0}
+- ${serial_bits > 0}
+- ${serial_bits <= 8}
+- ${serial_stopbits >= 1}
+- ${serial_stopbits <= 2}
+
+#  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
+#  Keys include:
+#      * label (an identifier for the GUI)
+#      * domain (optional - stream or message. Default is stream)
+#      * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#      * vlen (optional - data stream vector length. Default is 1)
+#      * optional (optional - set to 1 for optional inputs. Default is 0)
+inputs:
+- label: in
+  domain: stream
+  dtype: byte
+  vlen: 1
+  optional: 0
+
+
+file_format: 1
